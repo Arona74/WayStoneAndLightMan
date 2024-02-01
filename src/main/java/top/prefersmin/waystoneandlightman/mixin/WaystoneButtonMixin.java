@@ -36,7 +36,6 @@ import java.util.Optional;
  * @version 1.0
  */
 @Mixin(WaystoneButton.class)
-@OnlyIn(value = Dist.CLIENT)
 public class WaystoneButtonMixin extends Button {
 
     /**

@@ -15,7 +15,6 @@ import java.util.Set;
  * @author PrefersMin
  * @version 1.0
  */
-@OnlyIn(value = Dist.CLIENT)
 public class MixinPlugin implements IMixinConfigPlugin {
 
     private boolean isFrameworkInstalled;
