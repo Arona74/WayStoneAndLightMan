@@ -98,12 +98,12 @@ public class TeleportHandler {
     private static String getMoneyCostString(MoneyValue moneyCost) {
         String moneyCostString = moneyCost.getString();
         if (ModConfig.forceEnableChineseLanguage) {
-            moneyCostString = moneyCostString.replace("c", "铜币");
-            moneyCostString = moneyCostString.replace("i", "铁币");
-            moneyCostString = moneyCostString.replace("g", "金币");
-            moneyCostString = moneyCostString.replace("e", "绿宝石币币");
-            moneyCostString = moneyCostString.replace("d", "钻石币");
-            moneyCostString = moneyCostString.replace("n", "下界合金币");
+            moneyCostString = moneyCostString.replace("c", "铜币 ");
+            moneyCostString = moneyCostString.replace("i", "铁币 ");
+            moneyCostString = moneyCostString.replace("g", "金币 ");
+            moneyCostString = moneyCostString.replace("e", "绿宝石币 ");
+            moneyCostString = moneyCostString.replace("d", "钻石币 ");
+            moneyCostString = moneyCostString.replace("n", "下界合金币 ");
         }
         return moneyCostString;
     }
