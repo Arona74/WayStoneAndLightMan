@@ -1,0 +1,9 @@
+{
+  "gui.need": "Money Requirement: %d",
+  "gui.free": "It's free.",
+  "gui.notSufficientFunds": "Not enough money,player position may have changed",
+  "gui.notSufficientFundsLog": "Not enough money,need %d",
+  "gui.teleportCost": "Teleport cost:%d",
+  "gui.alertMoneyCost": "You have paid %d for the teleport",
+  "gui.teleportLog": "teleport %d meters"
+}

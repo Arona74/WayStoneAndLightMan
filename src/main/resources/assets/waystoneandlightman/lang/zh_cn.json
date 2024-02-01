@@ -1,0 +1,9 @@
+{
+  "gui.need": "花费: %d",
+  "gui.free": "这是免费的",
+  "gui.notSufficientFunds": "余额不足,玩家位置可能已发生改变",
+  "gui.notSufficientFundsLog": "余额不足,需要 %d",
+  "gui.teleportCost": "传送花费:%d",
+  "gui.alertMoneyCost": "你已支付 %d 用于传送",
+  "gui.teleportLog": "传送了 %d 米"
+}

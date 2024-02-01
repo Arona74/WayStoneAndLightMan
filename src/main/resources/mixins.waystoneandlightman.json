@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "top.prefersmin.waystoneandlightman.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "refmap": "mixins.waystoneandlightman.refmap.json",
+  "plugin": "top.prefersmin.waystoneandlightman.mixin.MixinPlugin",
+  "mixins": [
+    "WaystoneButtonMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
