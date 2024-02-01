@@ -45,6 +45,10 @@ public class ModConfig {
             .comment("是否启用传送消耗提示")
             .define("enableCostTip", true);
 
+    private static final ForgeConfigSpec.BooleanValue FORCE_ENABLE_CHINESE_LANGUAGE = BUILDER
+            .comment("是否强制启用中文语言")
+            .define("forceEnableChineseLanguage", false);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static boolean isEnableMoneyCost;
@@ -54,6 +58,7 @@ public class ModConfig {
     public static int maximumCost;
     public static boolean enableConsoleLog;
     public static boolean enableCostTip;
+    public static boolean forceEnableChineseLanguage;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
@@ -64,6 +69,7 @@ public class ModConfig {
         maximumCost = MAXIMUM_COST.get();
         enableConsoleLog = ENABLE_CONSOLE_LOG.get();
         enableCostTip = ENABLE_COST_TIP.get();
+        forceEnableChineseLanguage = FORCE_ENABLE_CHINESE_LANGUAGE.get();
     }
 
 }

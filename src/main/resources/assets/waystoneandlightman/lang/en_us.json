@@ -5,5 +5,5 @@
   "gui.notSufficientFundsLog": "Not enough money,need %d",
   "gui.teleportCost": "Teleport cost:%d",
   "gui.alertMoneyCost": "You have paid %d for the teleport",
-  "gui.teleportLog": "teleport %d meters"
+  "gui.teleportLog": "%d teleport %d meters"
 }

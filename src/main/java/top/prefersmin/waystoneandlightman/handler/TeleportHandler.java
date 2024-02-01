@@ -11,6 +11,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import top.prefersmin.waystoneandlightman.WayStoneAndLightMan;
 import top.prefersmin.waystoneandlightman.config.ModConfig;
@@ -28,6 +29,7 @@ public class TeleportHandler {
 
     /**
      * 监听方法
+     *
      * @param event 传送事件
      */
     @SubscribeEvent
@@ -62,23 +64,27 @@ public class TeleportHandler {
                 event.setCanceled(true);
             }
 
+            // 判断是否强制使用中文
+            String moneyCostString = getMoneyCostString(moneyCost);
+
             // 控制台输出
             if (ModConfig.enableConsoleLog) {
                 LOGGER.info("--------------------------------------------");
-                LOGGER.info(player.getName().getString() + Component.translatable("gui.teleportLog", (int) dist).getString());
+                LOGGER.info(Component.translatable("gui.teleportLog", player.getName().getString(), (int) dist).getString());
                 if (canPlayerAfford) {
-                    LOGGER.info(Component.translatable("gui.teleportCost", moneyCost.getString()).getString());
+                    LOGGER.info(Component.translatable("gui.teleportCost", moneyCostString).getString());
                 } else {
-                    LOGGER.info(Component.translatable("gui.notSufficientFundsLog", moneyCost.getString()).getString());
+                    LOGGER.info(Component.translatable("gui.notSufficientFundsLog", moneyCostString).getString());
                 }
                 LOGGER.info("--------------------------------------------");
             }
+
 
             // 局内提示
             if (ModConfig.enableCostTip) {
                 Component message;
                 if (canPlayerAfford) {
-                    message = Component.translatable("gui.alertMoneyCost", moneyCost.getString());
+                    message = Component.translatable("gui.alertMoneyCost", moneyCostString);
                 } else {
                     message = Component.translatable("gui.notSufficientFunds");
                 }
@@ -86,6 +92,20 @@ public class TeleportHandler {
             }
 
         }
+    }
+
+    @NotNull
+    private static String getMoneyCostString(MoneyValue moneyCost) {
+        String moneyCostString = moneyCost.getString();
+        if (ModConfig.forceEnableChineseLanguage) {
+            moneyCostString = moneyCostString.replace("c", "铜币");
+            moneyCostString = moneyCostString.replace("i", "铁币");
+            moneyCostString = moneyCostString.replace("g", "金币");
+            moneyCostString = moneyCostString.replace("e", "绿宝石币币");
+            moneyCostString = moneyCostString.replace("d", "钻石币");
+            moneyCostString = moneyCostString.replace("n", "下界合金币");
+        }
+        return moneyCostString;
     }
 
 }
