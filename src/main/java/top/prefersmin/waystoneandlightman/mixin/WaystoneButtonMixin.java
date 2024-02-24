@@ -1,9 +1,6 @@
 package top.prefersmin.waystoneandlightman.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.lightman314.lightmanscurrency.api.money.MoneyAPI;
-import io.github.lightman314.lightmanscurrency.api.money.value.MoneyValue;
-import io.github.lightman314.lightmanscurrency.api.money.value.builtin.CoinValue;
 import net.blay09.mods.waystones.api.IWaystone;
 import net.blay09.mods.waystones.client.gui.widget.WaystoneButton;
 import net.minecraft.ChatFormatting;
@@ -20,7 +17,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import top.prefersmin.waystoneandlightman.config.ModConfig;
+import top.prefersmin.waystoneandlightman.util.CostUtil;
+import top.prefersmin.waystoneandlightman.vo.TeleportCostVo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +29,7 @@ import java.util.Optional;
  * Mixin混入
  *
  * @author PrefersMin
- * @version 1.0
+ * @version 1.1
  */
 @Mixin(WaystoneButton.class)
 public class WaystoneButtonMixin extends Button {
@@ -57,28 +55,16 @@ public class WaystoneButtonMixin extends Button {
     private int wayStoneAndLightMan$distance;
 
     /**
-     * 传送花费
+     * 传送花费对象
      */
     @Unique
-    private MoneyValue wayStoneAndLightMan$moneyCost;
-
-    /**
-     * 余额是否足够
-     */
-    @Unique
-    private boolean wayStoneAndLightMan$canMoneyAfford;
+    private TeleportCostVo wayStoneAndLightMan$teleportCost;
 
     /**
      * 是否渲染距离与消耗
      */
     @Unique
     private boolean wayStoneAndLightMan$isRender;
-
-    /**
-     * 传送花费
-     */
-    @Unique
-    private int wayStoneAndLightMan$moneyInt = 0;
 
     /**
      * 左侧消耗图标
@@ -100,12 +86,13 @@ public class WaystoneButtonMixin extends Button {
             return;
         }
 
-        // 计算距离与余额是否足以支付传送费用
-        wayStoneAndLightMan$distance = wayStoneAndLightMan$caclulateDistance(player);
-        wayStoneAndLightMan$canMoneyAfford = wayStoneAndLightMan$canPlayerAfford(player, wayStoneAndLightMan$distance);
+        // 计算距离
+        wayStoneAndLightMan$distance = (int) player.position().distanceTo(waystone.getPos().getCenter());
+        // 计算传送费用并判断余额是否足以支付传送费用
+        wayStoneAndLightMan$teleportCost = CostUtil.TeleportCostCalculate(player, wayStoneAndLightMan$distance);
 
         // 余额不足
-        if (!wayStoneAndLightMan$canMoneyAfford && !player.getAbilities().instabuild) {
+        if (!wayStoneAndLightMan$teleportCost.isCanAfford() && !player.getAbilities().instabuild) {
             active = false;
         }
 
@@ -114,27 +101,6 @@ public class WaystoneButtonMixin extends Button {
             wayStoneAndLightMan$isRender = true;
         }
 
-    }
-
-    // 计算距离
-    @Unique
-    public int wayStoneAndLightMan$caclulateDistance(Player player) {
-        return wayStoneAndLightMan$distance = (int) player.position().distanceTo(waystone.getPos().getCenter());
-    }
-
-    // 判断是否有能力支付传送费用
-    @Unique
-    public boolean wayStoneAndLightMan$canPlayerAfford(Player player, int distance) {
-        if (player.getAbilities().instabuild) {
-            return true;
-        }
-        int moneyCostPerHundredMeter = ModConfig.moneyCostPerHundredMeter;
-        int minimumCost = ModConfig.minimumCost;
-        int maximumCost = ModConfig.maximumCost;
-        int moneyValue = (ModConfig.roundUp ? (int) Math.ceil(distance / (double) 100) : (int) Math.floor(distance / (double) 100)) * moneyCostPerHundredMeter;
-        wayStoneAndLightMan$moneyInt = Math.min(Math.max(moneyValue, minimumCost), maximumCost);
-        wayStoneAndLightMan$moneyCost = CoinValue.fromNumber("main", wayStoneAndLightMan$moneyInt);
-        return MoneyAPI.canPlayerAfford(player, wayStoneAndLightMan$moneyCost) || player.getAbilities().instabuild;
     }
 
     // 重写渲染方法
@@ -176,7 +142,7 @@ public class WaystoneButtonMixin extends Button {
 
                 // 判断余额与经验是否足以传送消耗
                 boolean haveXpLevelRequirement = xpLevelCost > 0;
-                boolean haveMoneyRequirement = wayStoneAndLightMan$moneyInt > 0;
+                boolean haveMoneyRequirement = !wayStoneAndLightMan$teleportCost.getCost().isFree();
                 boolean canXpLevelAfford = Objects.requireNonNull(mc.player).experienceLevel >= xpLevelCost || mc.player.getAbilities().instabuild;
 
                 // 经验消耗提示
@@ -188,8 +154,8 @@ public class WaystoneButtonMixin extends Button {
 
                 // 余额消耗提示
                 if (haveMoneyRequirement) {
-                    final var moneyRequirementText = Component.translatable("gui.need", wayStoneAndLightMan$moneyCost.getString());
-                    moneyRequirementText.withStyle(wayStoneAndLightMan$canMoneyAfford ? ChatFormatting.GREEN : ChatFormatting.RED);
+                    final var moneyRequirementText = Component.translatable("gui.need", wayStoneAndLightMan$teleportCost.getCost().getString());
+                    moneyRequirementText.withStyle(wayStoneAndLightMan$teleportCost.isCanAfford() ? ChatFormatting.GREEN : ChatFormatting.RED);
                     tooltip.add(moneyRequirementText);
                 }
 

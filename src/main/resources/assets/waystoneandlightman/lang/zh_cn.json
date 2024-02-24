@@ -5,5 +5,5 @@
   "gui.notSufficientFundsLog": "余额不足,需要 %d",
   "gui.teleportCost": "传送花费:%d",
   "gui.alertMoneyCost": "你已支付 %d 用于传送",
-  "gui.teleportLog": " 传送了 %d 米"
+  "gui.teleportLog": "%d 传送了 %d 米"
 }

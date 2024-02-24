@@ -3,7 +3,6 @@ package top.prefersmin.waystoneandlightman.handler;
 import com.mojang.logging.LogUtils;
 import io.github.lightman314.lightmanscurrency.api.money.MoneyAPI;
 import io.github.lightman314.lightmanscurrency.api.money.value.MoneyValue;
-import io.github.lightman314.lightmanscurrency.api.money.value.builtin.CoinValue;
 import net.blay09.mods.waystones.api.WaystoneTeleportEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -15,17 +14,39 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import top.prefersmin.waystoneandlightman.WayStoneAndLightMan;
 import top.prefersmin.waystoneandlightman.config.ModConfig;
+import top.prefersmin.waystoneandlightman.util.CostUtil;
+import top.prefersmin.waystoneandlightman.vo.TeleportCostVo;
 
 /**
  * 监听传送事件
  *
  * @author PrefersMin
- * @version 1.0
+ * @version 1.1
  */
 @Mod.EventBusSubscriber(modid = WayStoneAndLightMan.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class TeleportHandler {
 
     private static final Logger LOGGER = LogUtils.getLogger();
+
+    @NotNull
+    private static String getMoneyCostString(MoneyValue moneyCost) {
+
+        String moneyCostString = moneyCost.getString();
+
+        if (ModConfig.forceEnableChineseLanguage) {
+
+            moneyCostString = moneyCostString.replace("c", "铜币 ")
+                    .replace("i", "铁币 ")
+                    .replace("g", "金币 ")
+                    .replace("e", "绿宝石币 ")
+                    .replace("d", "钻石币 ")
+                    .replace("n", "下界合金币 ");
+
+        }
+
+        return moneyCostString;
+
+    }
 
     /**
      * 监听方法
@@ -44,34 +65,26 @@ public class TeleportHandler {
 
             // 计算距离
             BlockPos pos = event.getContext().getTargetWaystone().getPos();
-            double dist = Math.sqrt(player.distanceToSqr(pos.getX(), player.getY(), pos.getZ()));
+            int distance = (int) player.position().distanceTo(pos.getCenter());
 
-            // 计算花费
-            int moneyValue = (ModConfig.roundUp ? (int) Math.ceil(dist / (double) 100) : (int) Math.floor(dist / (double) 100)) * ModConfig.moneyCostPerHundredMeter;
-            if (moneyValue == 0) {
-                return;
-            }
-
-            // 转换为货币
-            MoneyValue moneyCost = CoinValue.fromNumber("main", Math.min(Math.max(moneyValue, ModConfig.minimumCost), ModConfig.maximumCost));
-            // 判断余额
-            boolean canPlayerAfford = MoneyAPI.canPlayerAfford(player, moneyCost);
+            // 计算传送费用并判断余额是否足以支付传送费用
+            TeleportCostVo teleportCostVo = CostUtil.TeleportCostCalculate(player, distance);
 
             // 执行消费或取消传送
-            if (canPlayerAfford) {
-                MoneyAPI.takeMoneyFromPlayer(player, moneyCost);
+            if (teleportCostVo.isCanAfford()) {
+                MoneyAPI.API.GetPlayersMoneyHandler(player).extractMoney(teleportCostVo.getCost(), false);
             } else {
                 event.setCanceled(true);
             }
 
             // 判断是否强制使用中文
-            String moneyCostString = getMoneyCostString(moneyCost);
+            String moneyCostString = getMoneyCostString(teleportCostVo.getCost());
 
             // 控制台输出
             if (ModConfig.enableConsoleLog) {
                 LOGGER.info("--------------------------------------------");
-                LOGGER.info(Component.translatable("gui.teleportLog", player.getName().getString(), (int) dist).getString());
-                if (canPlayerAfford) {
+                LOGGER.info(Component.translatable("gui.teleportLog", player.getName().getString(), distance).getString());
+                if (teleportCostVo.isCanAfford()) {
                     LOGGER.info(Component.translatable("gui.teleportCost", moneyCostString).getString());
                 } else {
                     LOGGER.info(Component.translatable("gui.notSufficientFundsLog", moneyCostString).getString());
@@ -79,11 +92,14 @@ public class TeleportHandler {
                 LOGGER.info("--------------------------------------------");
             }
 
+            if (teleportCostVo.getCost().isFree()) {
+                return;
+            }
 
             // 局内提示
             if (ModConfig.enableCostTip) {
                 Component message;
-                if (canPlayerAfford) {
+                if (teleportCostVo.isCanAfford()) {
                     message = Component.translatable("gui.alertMoneyCost", moneyCostString);
                 } else {
                     message = Component.translatable("gui.notSufficientFunds");
@@ -92,20 +108,6 @@ public class TeleportHandler {
             }
 
         }
-    }
-
-    @NotNull
-    private static String getMoneyCostString(MoneyValue moneyCost) {
-        String moneyCostString = moneyCost.getString();
-        if (ModConfig.forceEnableChineseLanguage) {
-            moneyCostString = moneyCostString.replace("c", "铜币 ");
-            moneyCostString = moneyCostString.replace("i", "铁币 ");
-            moneyCostString = moneyCostString.replace("g", "金币 ");
-            moneyCostString = moneyCostString.replace("e", "绿宝石币 ");
-            moneyCostString = moneyCostString.replace("d", "钻石币 ");
-            moneyCostString = moneyCostString.replace("n", "下界合金币 ");
-        }
-        return moneyCostString;
     }
 
 }

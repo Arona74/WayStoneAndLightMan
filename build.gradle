@@ -75,10 +75,10 @@ dependencies {
     // Waystone依赖、Balm依赖、Lightmans Currency依赖
     compileOnly('curse.maven:waystones-245755:4962610')
     compileOnly('curse.maven:balm-531761:4943500')
-    compileOnly('curse.maven:lightmans-currency-472521:5063228')
+    compileOnly('curse.maven:lightmans-currency-472521:5127058')
 }
 
-//M ixin配置
+//Mixin配置
 mixin {
     // MixinGradle Settings
     add sourceSets.main, 'mixins.waystoneandlightman.refmap.json'
