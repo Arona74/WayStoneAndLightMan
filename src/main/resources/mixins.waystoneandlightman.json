@@ -6,9 +6,9 @@
   "refmap": "mixins.waystoneandlightman.refmap.json",
   "plugin": "top.prefersmin.waystoneandlightman.mixin.MixinPlugin",
   "mixins": [
-    "WaystoneButtonMixin"
   ],
   "client": [
+    "WaystoneButtonMixin"
   ],
   "injectors": {
     "defaultRequire": 1
