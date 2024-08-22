@@ -1,0 +1,9 @@
+{
+  "gui.need": "Coût: %d.",
+  "gui.free": "Gratuit!",
+  "gui.notSufficientFunds": "Pas assez d'argent!",
+  "gui.notSufficientFundsLog": "Pas assez d'argent, besoin de %d.",
+  "gui.teleportCost": "Le voyage a couté: %d",
+  "gui.alertMoneyCost": "Vous avez payé %d pour voyager par Waystone.",
+  "gui.teleportLog": "%d téléporté de %d mètres."
+}
